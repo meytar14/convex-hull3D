@@ -69,6 +69,7 @@ class Facet:
             edges_dict[e].facets[self.id]=self.id
         self.conflict={}
         self.neighbors={}
+
     def destroy(self,edges_dict,points_dict):
         #self.alive=False
         # for e in self.edges:
@@ -78,6 +79,7 @@ class Facet:
 
     def __str__(self):
         return f"(id:{self.id}({self.p0},{self.p1},{self.p2}))"
+
 def plot(edges_dict,points_dict):
     plt.axes(projection='3d')
 
@@ -100,12 +102,9 @@ def plot(edges_dict,points_dict):
         zz=[z,z+0.1]
 
         plt.plot(xx, yy, zz, 'b', linewidth=3)
-
-
-
-
     plt.title('Polygon')
     plt.show()
+
 def points_equal(p1,p2):
     if p1.x!=p2.x:
         return False
@@ -130,11 +129,7 @@ def findsubsets(s, n):
     return list(itertools.combinations(s, n))
 
 def generate_unique_random_list(n): #return a random order of the points
-    #n=len(points)
-    #new_order={}
     permutation=random.sample(range(n), n)
-    # for i in range(n):
-    #     new_order[i]=points[permutation[i]]
     return permutation
 
 def fix_face(face):#the vertices of each face should be listed in clockwise order when viewed from outside
@@ -167,15 +162,12 @@ def define_order(p1,p2,p3,points_till_now_dict):
         if det>0:
             c=comb
             break
-    print('hi')
     return points[c[0]],points[c[1]],points[c[2]]
 
 
 def clockwise(p1,p2,p3,d):
     m=[[1, 1, 1, 1], [p1.x, p2.x, p3.x, d.x], [p1.y, p2.y, p3.y, d.y], [p1.z, p2.z, p3.z, d.z]]
     det=np.linalg.det(m)
-    if det==0:
-        print('det ===========0')
     if det<0:
         return -1 # clockwise
     else:
@@ -222,8 +214,7 @@ def convex_hull(file):
             for face in new_point.conflict:
                 for e in facets_dict[face].edges:
                     wing=[]
-                    if e=='(id:45(32,9,292))(id:36(240,45,36))':
-                        print('debug')
+
                     for facet_in_wing in edges_dict[e].facets:
                         wing.append(facet_in_wing)
                     f1=facets_dict[wing[0]]
@@ -233,12 +224,8 @@ def convex_hull(file):
                     if c1!=c2:
                         if not horizon_edges.__contains__(e):
                             horizon_edges.append(e)
-                        destroy[face]=True
-            if new_point.id == 35: #debug
-                print('h')
-                plot(edges_dict, points_till_now_dict)
-            #plot(edges_dict, points_till_now_dict)
-            #destroy2=destroy
+                    destroy[face]=True
+
             for f in destroy:
                 for e in facets_dict[f].edges:
 
@@ -247,9 +234,7 @@ def convex_hull(file):
                             edges_dict.pop(e)
                     else:
                         edges_dict[e].facets.pop(f)
-                    if new_point.id == 35:
-                        print('h')
-                        plot(edges_dict, points_till_now_dict)
+
 
                 facets_dict[f].destroy(edges_dict, points_dict)
                 facets_dict.pop(f)
@@ -258,9 +243,8 @@ def convex_hull(file):
                 p1, p2, p3 = define_order(e_temp.p0,e_temp.p1,new_point, points_till_now_dict)
                 new_facet=Facet(p1,p2,p3,edges_dict)
                 facets_dict[new_facet.id]=new_facet
-        plot(edges_dict, points_till_now_dict)
-        print(new_point)
 
+    plot(edges_dict, points_till_now_dict)
     final_facets=[]
     for f in facets_dict:
         final_facets.append(facets_dict[f])
@@ -268,46 +252,14 @@ def convex_hull(file):
     return fixed_output
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
-    file='sampleinput.txt'
-    # points=read_points('sampleinput.txt')
-    # facets=[[3,4,5],[8,7,6],[4,2,5],[2,3,4]]
-    # print(facets.pop())
-    # print(facets)
-    # p=Point(1,1,1)
-    # p1=Point(2,2,2)
-    # p2=Point(3,3,3)
-    # p3=Point(4,4,4)
-    # d=Point(5,5,5)
-
-
-    # p.conflict.append(f)
-    # print(f)
-    # #p.conflict[0].p0=d
-    # print(f2)
-    #convex_hull(file)
-    # e={}
-    # f=Facet(p1,p2,p3,e)
-    # f2 = Facet(p1, p2, d, e)
-    # print()
-
-
-
-    out=convex_hull(file)
-    # print(out)
-
+    file = 'input.txt'
+    out = convex_hull(file)
+    print(out)
+    f = open("output.txt", "a")
+    for edge in out:
+        f.write(f'{edge[0]} {edge[1]} {edge[2]} \n')
+    f.close()
 
 
 
